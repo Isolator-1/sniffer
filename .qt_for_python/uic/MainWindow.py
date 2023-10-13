@@ -65,6 +65,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.textEdit = QtWidgets.QTextEdit(parent=self.horizontalLayoutWidget)
+        self.textEdit.setDocumentTitle("")
         self.textEdit.setObjectName("textEdit")
         self.horizontalLayout.addWidget(self.textEdit)
         self.pushButton = QtWidgets.QPushButton(parent=self.horizontalLayoutWidget)
