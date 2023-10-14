@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>727</width>
-    <height>677</height>
+    <height>686</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,6 +41,12 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QTextEdit" name="textEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="documentTitle">
           <string/>
          </property>
@@ -78,18 +84,8 @@
           <enum>Qt::ActionsContextMenu</enum>
          </property>
          <property name="columnCount">
-          <number>7</number>
+          <number>5</number>
          </property>
-         <column>
-          <property name="text">
-           <string>No.</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Time</string>
-          </property>
-         </column>
          <column>
           <property name="text">
            <string>Source</string>
@@ -121,7 +117,7 @@
         <widget class="QTableWidget" name="tableWidget_3"/>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget_2"/>
+        <widget class="QTextBrowser" name="textBrowser"/>
        </item>
       </layout>
      </item>
