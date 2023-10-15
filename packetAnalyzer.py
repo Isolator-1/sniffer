@@ -1,10 +1,10 @@
 from scapy.all import *
-# 2 
+# 2 层
 etherTypeList = {"ipv4":0x0800,"ipv6":0x86dd,"arp":0x0806}
-# 3
+# 3 层
 ipv4ProtoList = {"tcp":6,"udp":17}
 ipv6NextHeader = {"icmp":58,"tcp":6,"udp":17}
-# 4
+# 4 层
 tcpFlags = {
     16: "ACK",
     1: "FIN",
@@ -16,6 +16,7 @@ tcpFlags = {
     128: "CWR",
     3: "SYN FIN"
 }
+
 icmpv6Type = {
     1: "Destination Unreachable",
     2: "Packet Too Big",
@@ -97,17 +98,24 @@ def udpApplicationLayerAnalysis(packet,Protocol,Info):
 def getSummary(packet):
 
     Source,Destination,Protocol,Length,Info = None,None,None,None,None
-    
-    if packet["Ether"].type == etherTypeList["ipv4"]:
+    if "Ether" not in packet:
+        Source = ""
+        Destination = ""
+        Protocol = "Ether"
+        Info = "Ethernet Packet"
+        
+    elif packet["Ether"].type == etherTypeList["ipv4"]:
         Source = packet["IP"].src
         Destination = packet["IP"].dst
 
         if packet["IP"].proto == ipv4ProtoList["tcp"]:
             Protocol = "TCP"
             # 如果能识别出应用层协议就不显示tcp协议
-            Info  = str(packet["TCP"].sport) +"->" +str(packet["TCP"].dport) + " "
-            Info += analysisTCPFlags(packet["TCP"].flags) + " SEQ=" + str(packet["TCP"].seq) + " ACK=" + str(packet["TCP"].ack)
-            Protocol,Info = tcpApplicationLayerAnalysis(packet, Protocol, Info) # 如果没有识别出应用层协议就原样返回
+            if "Raw" in packet:
+                Protocol,Info = tcpApplicationLayerAnalysis(packet, Protocol, Info) # 如果没有识别出应用层协议就原样返回
+            else:
+                Info  = str(packet["TCP"].sport) +"->" +str(packet["TCP"].dport) + " "
+                Info += analysisTCPFlags(packet["TCP"].flags) + " SEQ=" + str(packet["TCP"].seq) + " ACK=" + str(packet["TCP"].ack)
         elif packet["IP"].proto == ipv4ProtoList["udp"]:
             Protocol = "UDP"
             Info = str(packet["UDP"].sport) +"->" + str(packet["UDP"].dport)
@@ -124,15 +132,26 @@ def getSummary(packet):
             Info = icmpv6Type[packet["IPv6"][1].type]
         elif packet["IPv6"].nh == ipv6NextHeader["tcp"]:
             Protocol = "TCPv6"
-            Info  = str(packet["TCP"].sport) +"->" +str(packet["TCP"].dport) + " "
-            Info += analysisTCPFlags(packet["TCP"].flags) + " SEQ=" + str(packet["TCP"].seq) + " ACK=" + str(packet["TCP"].ack)
-            Protocol,Info = tcpApplicationLayerAnalysis(packet, Protocol, Info) # 如果没有识别出应用层协议就原样返回
+            if "Raw" in packet:
+                Protocol,Info = tcpApplicationLayerAnalysis(packet, Protocol, Info) # 如果没有识别出应用层协议就原样返回
+            else:
+                Info  = str(packet["TCP"].sport) +"->" +str(packet["TCP"].dport) + " "
+                Info += analysisTCPFlags(packet["TCP"].flags) + " SEQ=" + str(packet["TCP"].seq) + " ACK=" + str(packet["TCP"].ack)
         elif packet["IPv6"].nh == ipv6NextHeader["udp"]:
             Protocol = "UDP"
             Info = str(packet["UDP"].sport) +"->" + str(packet["UDP"].dport)
             Protocol,Info = udpApplicationLayerAnalysis(packet, Protocol, Info)
         else:
             print("Exception : unable to identify the packet (IPv6-NextHeader) , " , packet)
+
+    elif packet["Ether"].type ==etherTypeList["arp"]:
+        Protocol = "ARP"
+        if packet["ARP"].op == 1:
+            Info = "ARP Who has " + packet["ARP"].pdst
+        elif packet["ARP"].op == 2:
+            Info = "ARP Reply " + packet["ARP"].psrc
+        else:
+            Info = "ARP Packet"
 
     elif packet["Ether"].type not in etherTypeList:
         Source = packet["Ether"].src
@@ -147,3 +166,10 @@ def getSummary(packet):
 
     Length = len(raw(packet))
     return Source,Destination,Protocol,Length,Info
+
+def getTreeInfo(packet):
+    tree = []
+    if "Ether" in packet:
+        EtherSrc = packet["Ether"].src
+        EtherDst = packet["Ether"].dst
+        EtherType = packet["Ether"].type
