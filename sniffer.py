@@ -1,3 +1,4 @@
+from logging import Filter
 import sys,ctypes,os,time,shutil
 from datetime import datetime
 
@@ -170,7 +171,10 @@ def updateInformation(item,mainWindowUI):
     hexd = stdoutCapture(hexdump,FilterList[row],Capturelock,Analyzelock)
     mainWindowUI.textBrowser.setText(hexd)
     tree = getTreeInfo(FilterList[row])
-    mainWindowUI.textBrowser_2.setText(tree)
+    treeText =  ""
+    for item in tree:
+        treeText += item + "\n"
+    mainWindowUI.textBrowser_2.setText(treeText)
 
 
 

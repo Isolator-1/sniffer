@@ -173,3 +173,18 @@ def getTreeInfo(packet):
         EtherSrc = packet["Ether"].src
         EtherDst = packet["Ether"].dst
         EtherType = packet["Ether"].type
+        tree.append("Ether Layer : \n\tdst={} \n\tsrc={} \n\ttype={}".format(EtherSrc,EtherDst,EtherType))
+    if "IP" in packet :
+        tree.append("IP Layer : \n\tversion={}\n\tihl={}\n\ttos={}\n\tlen={}\n\tid={}\n\tflag={}\n\tfrag={}\n\tttl={}\n\tproto={}\n\tchecksum={}\n\tsrc={}\n\tdst={}".format(str(packet["IP"].version),str(packet["IP"].ihl),str(packet["IP"].tos),str(packet["IP"].len),str(packet["IP"].id),str(packet["IP"].flags),str(packet["IP"].frag),str(packet["IP"].ttl),str(packet["IP"].proto),str(packet["IP"].chksum),str(packet["IP"].src),str(packet["IP"].dst)))
+    if "ARP" in packet:
+        tree.append("ARP Layer : \n\thwtype={}\n\tptype={}\n\thwlen={}\n\tplen={}\n\top={}\n\thwsrc={}\n\tpsrc={}\n\thwdst={}\n\tpdst={}".format(str(packet["ARP"].hwtype),str(packet["ARP"].ptype),str(packet["ARP"].hwlen),str(packet["ARP"].plen),str(packet["ARP"].op),str(packet["ARP"].hwsrc),str(packet["ARP"].psrc),str(packet["ARP"].hwdst),str(packet["ARP"].pdst)))
+    if "ICMP" in packet:
+        tree.append("ICMP Layer : ")
+    if "TCP" in packet:
+        tree.append("TCP Layer : \n\tsport={}\n\tdport={}\n\tseq={}\n\tack={}\n\tdataofs={}\n\treserved={}\n\tflaags={}\n\twindow={}\n\tchecksum={}\n\turgptr={}".format(str(packet["TCP"].sport),str(packet["TCP"].dport),str(packet["TCP"].seq),str(packet["TCP"].ack),str(packet["TCP"].dataofs),str(packet["TCP"].reserved),str(packet["TCP"].flags), str(packet["TCP"].window),str(packet["TCP"].chksum),str(packet["TCP"].urgptr)))
+    if "UDP" in packet:
+        tree.append("UDP Layer : ")
+    if "Raw" in packet:
+        tree.append("Application Layer : \n\t" + str(packet["Raw"].load))
+    return tree
+    
